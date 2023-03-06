@@ -37,9 +37,15 @@ private:
     // access the processor object that created it.
     AIPhaserAudioProcessor& audioProcessor;
 
-    CustomRotarySlider rateSlider, depthSlider, feedbackSlider, freqSlider, mixSlider;
+    juce::ComboBox effectbox;
 
-    juce::AudioProcessorValueTreeState::SliderAttachment rateAttachment, depthAttachment, feedbackAttachment, freqAttachment, mixAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> effectAttachment;
+
+    CustomRotarySlider chorusrateSlider, phaserrateSlider, chorusdepthSlider, phaserdepthSlider, chorusfeedbackSlider, phaserfeedbackSlider, 
+        chorusdelaySlider, phaserfreqSlider, mixSlider;
+
+    juce::AudioProcessorValueTreeState::SliderAttachment chorusrateAttachment, phaserrateAttachment, chorusdepthAttachment,
+        phaserdepthAttachment, chorusfeedbackAttachment, phaserfeedbackAttachment, chorusdelayAttachment, phaserfreqAttachment, mixAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AIPhaserAudioProcessorEditor)
 };

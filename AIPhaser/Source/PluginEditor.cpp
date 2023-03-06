@@ -11,25 +11,61 @@
 
 //==============================================================================
 AIPhaserAudioProcessorEditor::AIPhaserAudioProcessorEditor (AIPhaserAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), rateAttachment(audioProcessor.treestate, "rate", rateSlider),
-    depthAttachment(audioProcessor.treestate, "depth", depthSlider), freqAttachment(audioProcessor.treestate, "frequency", freqSlider),
-    feedbackAttachment(audioProcessor.treestate, "feedback", feedbackSlider), mixAttachment(audioProcessor.treestate, "mix", mixSlider)
+    : AudioProcessorEditor (&p), 
+    audioProcessor (p), chorusrateAttachment(audioProcessor.treestate, "chorus rate", chorusrateSlider),
+    chorusdepthAttachment(audioProcessor.treestate, "chorus depth", chorusdepthSlider),
+    chorusdelayAttachment(audioProcessor.treestate, "chorus delay", chorusdelaySlider),
+    chorusfeedbackAttachment(audioProcessor.treestate, "chorus feedback", chorusfeedbackSlider),
+    phaserrateAttachment(audioProcessor.treestate, "phaser rate", phaserrateSlider),
+    phaserdepthAttachment(audioProcessor.treestate, "phaser depth", phaserdepthSlider),
+    phaserfreqAttachment(audioProcessor.treestate, "phaser frequency", phaserfreqSlider),
+    phaserfeedbackAttachment(audioProcessor.treestate, "phaser feedback", phaserfeedbackSlider),
+    mixAttachment(audioProcessor.treestate, "mix", mixSlider)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    addAndMakeVisible(rateSlider);
-    rateSlider.setTextValueSuffix(" Hz");
-    rateSlider.setTextBoxIsEditable(true);
+    addAndMakeVisible(effectbox);
+    effectbox.addItem("Chorus", 1);
+    effectbox.addItem("Phaser", 2);
+    effectbox.setSelectedId(1);
+    effectAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(audioProcessor.treestate, "effect", effectbox);
 
-    addAndMakeVisible(depthSlider);
-    depthSlider.setTextBoxIsEditable(true);
+    
 
-    addAndMakeVisible(feedbackSlider);
-    feedbackSlider.setTextBoxIsEditable(true);
+    if (effectbox.getSelectedId() == 1)
+    {
+        addAndMakeVisible(chorusrateSlider);
+        chorusrateSlider.setTextValueSuffix(" Hz");
+        chorusrateSlider.setTextBoxIsEditable(true);
 
-    addAndMakeVisible(freqSlider);
-    freqSlider.setTextValueSuffix(" Hz");
-    freqSlider.setTextBoxIsEditable(true);
+        addAndMakeVisible(chorusdepthSlider);
+        chorusdepthSlider.setTextBoxIsEditable(true);
+
+        addAndMakeVisible(chorusfeedbackSlider);
+        chorusfeedbackSlider.setTextBoxIsEditable(true);
+
+        addAndMakeVisible(chorusdelaySlider);
+        chorusdelaySlider.setTextValueSuffix(" ms");
+        chorusdelaySlider.setTextBoxIsEditable(true);
+    }
+
+    if (effectbox.getSelectedId() == 2)
+    {
+        addAndMakeVisible(phaserrateSlider);
+        phaserrateSlider.setTextValueSuffix(" Hz");
+        phaserrateSlider.setTextBoxIsEditable(true);
+
+        addAndMakeVisible(phaserdepthSlider);
+        phaserdepthSlider.setTextBoxIsEditable(true);
+
+        addAndMakeVisible(phaserfeedbackSlider);
+        phaserfeedbackSlider.setTextBoxIsEditable(true);
+
+        addAndMakeVisible(phaserfreqSlider);
+        phaserfreqSlider.setTextValueSuffix(" Hz");
+        phaserfreqSlider.setTextBoxIsEditable(true);
+    }
+    
 
     addAndMakeVisible(mixSlider);
     mixSlider.setTextValueSuffix(" %");
@@ -68,12 +104,26 @@ void AIPhaserAudioProcessorEditor::resized()
     auto width = bounds.getWidth();
     auto height = bounds.getHeight();
     auto w = width / 5;
+    auto h1 = height * 0.1;
+    auto h9 = height * 0.9;
 
-    rateSlider.setBounds(x, y, w, height);
-    depthSlider.setBounds(w, y, w, height);
-    freqSlider.setBounds(2 * w, y, w, height);
-    feedbackSlider.setBounds(3 * w, y, w, height);
-    mixSlider.setBounds(4 * w, y, w, height);
+    effectbox.setBounds(width * 0.25, y, width * 0.5, h1);
+
+    if (effectbox.getSelectedId() == 1)
+    {
+        chorusrateSlider.setBounds(x, h1, w, h9);
+        chorusdepthSlider.setBounds(w, h1, w, h9);
+        chorusdelaySlider.setBounds(2 * w, h1, w, h9);
+        chorusfeedbackSlider.setBounds(3 * w, h1, w, h9);
+    }
+    if (effectbox.getSelectedId() == 2)
+    {
+        phaserrateSlider.setBounds(x, h1, w, h9);
+        phaserdepthSlider.setBounds(w, h1, w, h9);
+        phaserfreqSlider.setBounds(2 * w, h1, w, h9);
+        phaserfeedbackSlider.setBounds(3 * w, h1, w, h9);
+    }
+    mixSlider.setBounds(4 * w, h1, w, h9);
 
 
 }

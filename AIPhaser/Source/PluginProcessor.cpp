@@ -22,19 +22,29 @@ AIPhaserAudioProcessor::AIPhaserAudioProcessor()
                        ), treestate(*this, nullptr, "PARMETERS", createParameterLayout())
 #endif
 {
-    treestate.addParameterListener("rate", this);
-    treestate.addParameterListener("depth", this);
-    treestate.addParameterListener("frequency", this);
-    treestate.addParameterListener("feedback", this);
+    treestate.addParameterListener("effect", this);
+    treestate.addParameterListener("chorus rate", this);
+    treestate.addParameterListener("phaser rate", this);
+    treestate.addParameterListener("chorus depth", this);
+    treestate.addParameterListener("phaser depth", this);
+    treestate.addParameterListener("chorus delay", this);
+    treestate.addParameterListener("phaser frequency", this);
+    treestate.addParameterListener("chorus feedback", this);
+    treestate.addParameterListener("phaser feedback", this);
     treestate.addParameterListener("mix", this);
 }
 
 AIPhaserAudioProcessor::~AIPhaserAudioProcessor()
 {
-    treestate.removeParameterListener("rate", this);
-    treestate.removeParameterListener("depth", this);
-    treestate.removeParameterListener("frequency", this);
-    treestate.removeParameterListener("feedback", this);
+    treestate.removeParameterListener("effect", this);
+    treestate.removeParameterListener("chorus rate", this);
+    treestate.removeParameterListener("phaser rate", this);
+    treestate.removeParameterListener("chorus depth", this);
+    treestate.removeParameterListener("phaser depth", this);
+    treestate.removeParameterListener("chorus delay", this);
+    treestate.removeParameterListener("phaser frequency", this);
+    treestate.removeParameterListener("chorus feedback", this);
+    treestate.removeParameterListener("phaser feedback", this);
     treestate.removeParameterListener("mix", this);
 }
 
@@ -60,7 +70,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout AIPhaserAudioProcessor::crea
 
     auto pMix = std::make_unique<juce::AudioParameterFloat>("mix", "Mix", 0.0, 100.0, 100.0);
 
-
+    params.push_back(std::move(pChoice));
     params.push_back(std::move(pPRate));
     params.push_back(std::move(pCRate));
     params.push_back(std::move(pPDepth));
@@ -77,39 +87,42 @@ juce::AudioProcessorValueTreeState::ParameterLayout AIPhaserAudioProcessor::crea
 
 void AIPhaserAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
 {
-
+    if (parameterID == "effect")
+    {
+        cpp.setEffect(newValue);
+    }
     if (parameterID == "chorus rate")
     {
-        cpp.setRate(newValue);
+        cpp.setChorusRate(newValue);
     }
     if (parameterID == "chorus depth")
     {
-        cpp.setDepth(newValue);
+        cpp.setChorusDepth(newValue);
     }
     if (parameterID == "chorus delay")
     {
-        cpp.setCentre(newValue);
+        cpp.setChorusDelay(newValue);
     }
     if (parameterID == "chorus feedback")
     {
-        cpp.setFeedback(newValue);
+        cpp.setChorusFeedback(newValue);
     }
 
     if (parameterID == "phaser rate")
     {
-        cpp.setRate(newValue);
+        cpp.setPhaserRate(newValue);
     }
     if (parameterID == "phaser depth")
     {
-        cpp.setDepth(newValue);
+        cpp.setPhaserDepth(newValue);
     }
     if (parameterID == "phaser frequency")
     {
-        cpp.setCentre(newValue);
+        cpp.setPhaserFreq(newValue);
     }
     if (parameterID == "phaser feedback")
     {
-        cpp.setFeedback(newValue);
+        cpp.setPhaserFeedback(newValue);
     }
     if (parameterID == "mix")
     {
@@ -182,27 +195,14 @@ void AIPhaserAudioProcessor::changeProgramName (int index, const juce::String& n
 //==============================================================================
 void AIPhaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getTotalNumOutputChannels();
     spec.sampleRate = sampleRate;
 
-    //phaser.prepare(spec);
-
-    /*
-    cpp.chain.get<0>().setRate(chorus.getRate());
-    cpp.get<0>().setDepth(chorus.getDepth());
-    chain.get<0>().setCentreDelay(chorus.getCentreDelay());
-    chain.get<0>().setFeedback(chorus.getFeedback());
-    chain.get<1>().setRate(phaser.getRate());
-    chain.get<1>().setDepth(phaser.getDepth());
-    chain.get<1>().setCentreFrequency(phaser.getCentreFrequency());
-    chain.get<1>().setFeedback(phaser.getFeedback());
-    */
-    //cpp.setChorus();
-
+    cpp.prepareToPlay(spec);
+    
+    float fxchoice = *treestate.getRawParameterValue("effect");
     float prate = (*treestate.getRawParameterValue("phaser rate"));
     float pdepth = (*treestate.getRawParameterValue("phaser depth"));
     float pfreq = (*treestate.getRawParameterValue("phaser frequency"));
@@ -214,20 +214,20 @@ void AIPhaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     float cdelay = *treestate.getRawParameterValue("chorus delay");
     float cfeedback = *treestate.getRawParameterValue("chorus feedback");
 
-    if (*treestate.getRawParameterValue("effect") == 0.0f)
+    if (fxchoice == 0.0f)
     {
-        cpp.setRate(crate);
-        cpp.setDepth(cdepth);
-        cpp.setCentre(cdelay);
-        cpp.setFeedback(cfeedback);
+        cpp.setChorusRate(crate);
+        cpp.setChorusDepth(cdepth);
+        cpp.setChorusDelay(cdelay);
+        cpp.setChorusFeedback(cfeedback);
         cpp.setMix(mix);
     }
-    if (*treestate.getRawParameterValue("effect") == 1.0f)
+    if (fxchoice == 1.0f)
     {
-        cpp.setRate(prate);
-        cpp.setDepth(pdepth);
-        cpp.setCentre(pfreq);
-        cpp.setFeedback(pfeedback);
+        cpp.setPhaserRate(prate);
+        cpp.setPhaserDepth(pdepth);
+        cpp.setPhaserFreq(pfreq);
+        cpp.setPhaserFeedback(pfeedback);
         cpp.setMix(mix); 
     }
 
@@ -289,8 +289,8 @@ bool AIPhaserAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* AIPhaserAudioProcessor::createEditor()
 {
-    //return new AIPhaserAudioProcessorEditor (*this);
-    return new juce::GenericAudioProcessorEditor(*this);
+    return new AIPhaserAudioProcessorEditor (*this);
+    //return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -307,15 +307,15 @@ void AIPhaserAudioProcessor::setStateInformation (const void* data, int sizeInBy
     if (tree.isValid())
     {
         treestate.state = tree;
-
-        cpp.setRate(*treestate.getRawParameterValue("phaser rate"));
-        cpp.setRate(*treestate.getRawParameterValue("chorus rate"));
-        cpp.setDepth(*treestate.getRawParameterValue("phaser depth"));
-        cpp.setDepth(*treestate.getRawParameterValue("chorus depth"));
-        cpp.setCentre(*treestate.getRawParameterValue("phaser frequency"));
-        cpp.setCentre(*treestate.getRawParameterValue("chorus delay"));
-        cpp.setFeedback(*treestate.getRawParameterValue("chorus feedback"));
-        cpp.setFeedback(*treestate.getRawParameterValue("phaser feedback"));
+        cpp.setEffect(*treestate.getRawParameterValue("effect"));
+        cpp.setPhaserRate(*treestate.getRawParameterValue("phaser rate"));
+        cpp.setChorusRate(*treestate.getRawParameterValue("chorus rate"));
+        cpp.setPhaserDepth(*treestate.getRawParameterValue("phaser depth"));
+        cpp.setChorusDepth(*treestate.getRawParameterValue("chorus depth"));
+        cpp.setPhaserFreq(*treestate.getRawParameterValue("phaser frequency"));
+        cpp.setChorusDelay(*treestate.getRawParameterValue("chorus delay"));
+        cpp.setChorusFeedback(*treestate.getRawParameterValue("chorus feedback"));
+        cpp.setPhaserFeedback(*treestate.getRawParameterValue("phaser feedback"));
         cpp.setMix(*treestate.getRawParameterValue("mix") / 100.0);
     }
 }
