@@ -10,13 +10,13 @@ public:
         rightchain.get<0>().setDepth(0.2f);
         rightchain.get<0>().setCentreDelay(20.0f);
         rightchain.get<0>().setFeedback(0.1f);
-        rightchain.get<0>().setMix(100.0f);
+        rightchain.get<0>().setMix(1.0f);
 
         leftchain.get<1>().setRate(0.5f);
         leftchain.get<1>().setDepth(0.2f);
         leftchain.get<1>().setCentreFrequency(1000.0f);
         leftchain.get<1>().setFeedback(0.9f);
-        leftchain.get<1>().setMix(100.0f);
+        leftchain.get<1>().setMix(1.0f);
     }
 
     void prepareToPlay(const juce::dsp::ProcessSpec& spec)

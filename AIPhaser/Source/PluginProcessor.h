@@ -9,7 +9,6 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "MyClass.h"
 #include "ChorusPhaserProcessor.h"
 
 //==============================================================================
@@ -58,7 +57,6 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    //std::vector<float> pp[4];
 
     //==============================================================================
     // Value Trees
@@ -67,7 +65,6 @@ public:
 private:
 
     ChorusPhaserProcessor cpp;
-    //MyClass phaser;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void parameterChanged(const juce::String& parameterID, float newValue);
