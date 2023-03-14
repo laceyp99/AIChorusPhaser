@@ -31,13 +31,10 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-    void setChorusGuiVisible(bool isVisible);
-    void setPhaserGuiVisible(bool isVisible);
 
 private:
  
     AIPhaserAudioProcessor& audioProcessor;
-
 
     juce::ComboBox effectbox;
 
@@ -48,6 +45,8 @@ private:
 
     juce::AudioProcessorValueTreeState::SliderAttachment chorusrateAttachment, phaserrateAttachment, chorusdepthAttachment,
         phaserdepthAttachment, chorusfeedbackAttachment, phaserfeedbackAttachment, chorusdelayAttachment, phaserfreqAttachment, mixAttachment;
+
+    juce::Label mixLabel, rateLabel, depthLabel, feedbackLabel, chorusdelayLabel, phaserfreqLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AIPhaserAudioProcessorEditor)
 };

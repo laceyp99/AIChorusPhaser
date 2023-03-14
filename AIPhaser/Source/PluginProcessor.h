@@ -64,6 +64,7 @@ public:
 
 private:
 
+    // Chat GPT created class
     ChorusPhaserProcessor cpp;
 
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

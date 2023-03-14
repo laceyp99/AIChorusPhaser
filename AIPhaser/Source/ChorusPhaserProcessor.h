@@ -6,25 +6,17 @@ class ChorusPhaserProcessor
 public:
     ChorusPhaserProcessor() : currentEffectIndex(0)
     {
-        rightchain.get<0>().setRate(1.0f);
-        rightchain.get<0>().setDepth(0.2f);
-        rightchain.get<0>().setCentreDelay(20.0f);
-        rightchain.get<0>().setFeedback(0.1f);
-        rightchain.get<0>().setMix(1.0f);
-
-        leftchain.get<1>().setRate(0.5f);
-        leftchain.get<1>().setDepth(0.2f);
-        leftchain.get<1>().setCentreFrequency(1000.0f);
-        leftchain.get<1>().setFeedback(0.9f);
-        leftchain.get<1>().setMix(1.0f);
+        chain.get<0>().setRate(1.0f);
+        chain.get<0>().setDepth(0.2f);
+        chain.get<0>().setCentreDelay(20.0f);
+        chain.get<0>().setFeedback(0.1f);
+        chain.get<0>().setMix(1.0f);
     }
 
     void prepareToPlay(const juce::dsp::ProcessSpec& spec)
     {
-        leftchain.prepare(spec);
-        rightchain.prepare(spec);
-        leftchain.reset();
-        rightchain.reset();
+        chain.prepare(spec);
+        chain.reset();
     }
 
    
@@ -37,16 +29,15 @@ public:
         // Process the audio with the current effect
         if (currentEffectIndex == 0)
         {
-            leftchain.get<0>().process(context);
-            rightchain.get<0>().process(context);
+            chain.get<0>().process(context);
         }
         else
         {
-            leftchain.get<1>().process(context);
-            rightchain.get<1>().process(context);
+            chain.get<1>().process(context);
         }
     }
-
+    
+    // all these functions were added myself to pass parameters into this class from the treestate
     void setEffect(int effectIndex)
     {
         currentEffectIndex = effectIndex;
@@ -54,63 +45,56 @@ public:
 
     void setChorusRate(float rate)
     {
-        leftchain.get<0>().setRate(rate);
-        rightchain.get<0>().setRate(rate);
+        chain.get<0>().setRate(rate);
     }
 
     void setPhaserRate(float rate)
     {
-        leftchain.get<1>().setRate(rate);
-        rightchain.get<1>().setRate(rate);
+        chain.get<1>().setRate(rate);
     }
 
     void setChorusDepth(float depth)
     {
-        leftchain.get<0>().setDepth(depth);
-        rightchain.get<0>().setDepth(depth);
+        chain.get<0>().setDepth(depth);
     }
 
     void setPhaserDepth(float depth)
     {
-        leftchain.get<1>().setDepth(depth);
-        rightchain.get<1>().setDepth(depth);
+        chain.get<1>().setDepth(depth);
     }
 
     void setChorusDelay(float centre)
     {
-        leftchain.get<0>().setCentreDelay(centre);
-        rightchain.get<0>().setCentreDelay(centre);
+        chain.get<0>().setCentreDelay(centre);
     }
 
     void setPhaserFreq(float centre)
     {
-        leftchain.get<1>().setCentreFrequency(centre);
-        rightchain.get<1>().setCentreFrequency(centre);
+        chain.get<1>().setCentreFrequency(centre);
     }
 
     void setChorusFeedback(float feedback)
     {
-        leftchain.get<0>().setFeedback(feedback);
-        rightchain.get<0>().setFeedback(feedback);
+        chain.get<0>().setFeedback(feedback);
     }
 
     void setPhaserFeedback(float feedback)
     {
-        leftchain.get<1>().setFeedback(feedback);
-        rightchain.get<1>().setFeedback(feedback);
+        chain.get<1>().setFeedback(feedback);
     }
 
+    // since i had Chat GPT decide all my initial values and ranges for the parameters, the mix was the only one with
+    // the same numbers for both effects (100 and 0-100) so this was the only function that uses the currentEffectIndex to 
+    // choose which effect the mix is for
     void setMix(float mix)
     {
         if (currentEffectIndex == 0)
         {
-            leftchain.get<0>().setMix(mix);
-            rightchain.get<0>().setMix(mix);
+            chain.get<0>().setMix(mix);
         }
         if (currentEffectIndex == 1)
         {
-            leftchain.get<1>().setMix(mix);
-            rightchain.get<1>().setMix(mix);
+            chain.get<1>().setMix(mix);
         }
     }
 
@@ -118,6 +102,5 @@ private:
     
     int currentEffectIndex;
 
-    using Monochain = juce::dsp::ProcessorChain<juce::dsp::Chorus<float>, juce::dsp::Phaser<float>>;
-    Monochain leftchain, rightchain;
+    juce::dsp::ProcessorChain<juce::dsp::Chorus<float>, juce::dsp::Phaser<float>> chain;
 };

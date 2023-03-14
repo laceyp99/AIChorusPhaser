@@ -107,7 +107,6 @@ void AIPhaserAudioProcessor::parameterChanged(const juce::String& parameterID, f
     {
         cpp.setChorusFeedback(newValue);
     }
-
     if (parameterID == "phaser rate")
     {
         cpp.setPhaserRate(newValue);
@@ -202,6 +201,8 @@ void AIPhaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 
     cpp.prepareToPlay(spec);
     
+    // linking treestate parameters to ChatGPT generated Phaser/Chorus parameters
+
     float fxchoice = *treestate.getRawParameterValue("effect");
     float prate = (*treestate.getRawParameterValue("phaser rate"));
     float pdepth = (*treestate.getRawParameterValue("phaser depth"));
@@ -230,9 +231,6 @@ void AIPhaserAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
         cpp.setPhaserFeedback(pfeedback);
         cpp.setMix(mix); 
     }
-
-    //cpp.setPhaser(prate, pdepth, pfreq, pfeedback, pmix);
-
 }
 
 void AIPhaserAudioProcessor::releaseResources()
@@ -276,7 +274,8 @@ void AIPhaserAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    //phaser.processAudio(buffer);
+    // id normally make an audio block and pass the context within process functions, but ChatGPT's function calls for the AudioBuffer
+    // which makes this processBlock code super simple
     cpp.processAudio(buffer);
     
 }
